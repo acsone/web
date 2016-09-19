@@ -17,6 +17,12 @@ case of validation error.
 If not specified, the module will avoid proposing any of the create options
 if the current user has no permission rights to create the related object.
 
+The options provided includes as well, the possibility to propose the Most
+Recently used (MRU) values stored in the localstorage if nothing has been typed
+in the field and the uer desplays the drop-down. When the user start typing the
+field falls back to the normal behaviour.
+
+
 Usage
 =====
 
@@ -69,6 +75,10 @@ in the field's options dict
 
   Makes many2many_tags buttons that open the linked resource
 
+``search_mru`` *boolean* (Default: ``False``)
+
+  Display the MRU list stored in the localstorage before the user start typing.
+
 ir.config_parameter options
 ---------------------------
 
@@ -95,6 +105,10 @@ If you disable one option, you can enable it for particular field by setting "cr
 
   Whether the field should always show "Search more..." entry or not.
 
+``web_m2x_options.search_mru`` *boolean* (Default: default value is ``False``)
+
+  Display the MRU list stored in the localstorage before the user start typing.
+
 To add these parameters go to Configuration -> Technical -> Parameters -> System Parameters and add new parameters like:
 
 - web_m2x_options.create: False
@@ -102,7 +116,7 @@ To add these parameters go to Configuration -> Technical -> Parameters -> System
 - web_m2x_options.m2o_dialog: False
 - web_m2x_options.limit: 10
 - web_m2x_options.search_more: True
-
+- web_m2x_options.search_mru: False
 
 Example
 -------
@@ -110,13 +124,13 @@ Example
 Your XML form view definition could contain::
 
     ...
-    <field name="partner_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'search_more':true 'field_color':'state', 'colors':{'active':'green'}}"/>
+    <field name="partner_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'search_more':true 'field_color':'state', 'colors':{'active':'green'}, 'search_mru':true}"/>
     ...
 
 Known issues
 ============
 
-Double check that you have no inherited view that remove ``options`` you set on a field ! 
+Double check that you have no inherited view that remove ``options`` you set on a field !
 If nothing works, add a debugger in the first line of ``get_search_result method`` and enable debug mode in Odoo. When you write something in a many2one field, javascript debugger should pause. If not verify your installation.
 
 Roadmap

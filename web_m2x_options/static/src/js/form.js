@@ -5,7 +5,7 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
     "use strict";
 
     var $ = require("$");
-    var core = require('web.core'),
+    var core = require('web.core'), 
         data = require('web.data'),
         Dialog = require('web.Dialog'),
         Model = require('web.Model'),
@@ -17,7 +17,8 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
                    'web_m2x_options.create_edit',
                    'web_m2x_options.limit',
                    'web_m2x_options.search_more',
-                   'web_m2x_options.m2o_dialog',];
+                   'web_m2x_options.m2o_dialog',
+                   'web_m2x_options.search_mru',];
 
     var M2ODialog = Dialog.extend({
         template: "M2ODialog",
@@ -99,6 +100,26 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
             }
         },
 
+        compute_mru_key: function(){
+            var self = this,
+                model = self.view.model,
+                db = self.session.db,
+                view_id = self.view.fields_view.view_id || self.view.dataset.parent_view.fields_view.view_id;
+            return db + "/" + model + "/" + view_id + "/" + self.name;
+        },
+
+        get_search_mru: function(){
+            var mru_option = 'web_m2x_options_mru',
+                self = this;
+            var restore_mru_list = JSON.parse(localStorage.getItem(mru_option)),
+                key = self.compute_mru_key();
+            if (restore_mru_list) {
+                if (!_.isUndefined(restore_mru_list[key])){
+                    return ['id', 'in', restore_mru_list[key]];
+                }
+            }
+            return [];
+        },
         get_search_result: function (search_val) {
             var Objects = new Model(this.field.relation);
             var def = $.Deferred();
@@ -121,13 +142,27 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
 
             var dataset = new data.DataSet(this, this.field.relation,
                                                    self.build_context());
+            var domain_list = [];
             var blacklist = this.get_search_blacklist();
+            if(!_(blacklist).isEmpty()){
+                domain_list.push(['id', 'not in', blacklist]);
+            }
+            var can_search_mru = (self.options && self.is_option_set(self.options.search_mru)),
+                search_mru_undef = _.isUndefined(self.options.search_mru),
+                search_mru = self.is_option_set(self.view.ir_options['web_m2x_options.search_mru']);
+
+            var mru_list = self.get_search_mru();
+            if(search_val == "" && (can_search_mru || (search_mru_undef && search_mru))){
+                if (!_(mru_list).isEmpty()){
+                    domain_list.push(mru_list);
+                }
+            }
             this.last_query = search_val;
 
             var search_result = this.orderer.add(dataset.name_search(
                 search_val,
                 new data.CompoundDomain(
-                    self.build_domain(), [["id", "not in", blacklist]]),
+                    self.build_domain(), domain_list),
                 'ilike', this.limit + 1,
                 self.build_context()));
 
@@ -176,6 +211,16 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
                                     }
                                     def.resolve(values);
                                 });
+                }
+                // add label favorites if favorites option is set and
+                // search_val is empty
+                if(search_val == "" && (can_search_mru || (search_mru_undef && search_mru))){
+                    if (!_(mru_list).isEmpty() && !_(values).isEmpty()){
+                        values.unshift({
+                            label: _t("Most Recently Used:"),
+                            // classname: 'oe_m2o_dropdown_option',
+                        });
+                    }
                 }
 
                 // search more... if more results that max
@@ -251,6 +296,68 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
             });
 
             return def;
+        },
+
+        update_mru_list: function(){
+            var self = this,
+                mru_option = 'web_m2x_options_mru';
+            var key = self.compute_mru_key();
+            // check if the localstorage has some items for the current model
+            if (localStorage.getItem(mru_option)) {
+                var restore_mru_list = JSON.parse(localStorage.getItem(mru_option));
+                if (restore_mru_list[key]) {
+                    var queue = restore_mru_list[key];
+                    // if the element doesn't exist in the stack
+                    if (queue.indexOf(self.get_value(true)) < 0 && self.get_value(true)){
+                        if (queue.length < 5) {
+                            // add the new element at the beginning
+                            queue.unshift(self.get_value(true));
+                        }else {
+                            // remove the last element
+                            queue.pop();
+                            // add the new element at the beginning
+                            queue.unshift(self.get_value(true));
+                        }
+                        restore_mru_list[key] = queue;
+                    }else{
+                        // if the element already exist in the stack
+                        if (queue.indexOf(self.get_value(true)) >= 0 && self.get_value(true)){
+                            var index = queue.indexOf(self.get_value(true));
+                            // remove the element from the list
+                            queue.splice(index, 1);
+                            // and put it back at the beginning
+                            queue.unshift(self.get_value(true));
+                        }
+                    }
+                }else{
+                    // if the element is the first one
+                    if (self.get_value(true)){
+                        restore_mru_list[key] = [self.get_value(true)];
+                    }
+                }
+                localStorage.setItem(mru_option, JSON.stringify(restore_mru_list));
+            }else {
+                // first time to create an entry in the localstorage
+                if (self.get_value(true)){
+                    var values = {}
+                    values[key] = [self.get_value(true)]
+                    localStorage.setItem(mru_option, JSON.stringify(values));
+                }
+            }
+        },
+
+        commit_value: function() {
+            var self = this;
+            // if the field value has changed and has favorites option
+            if (self._dirty_flag){
+                var can_search_mru = (self.options && self.is_option_set(self.options.search_mru)),
+                    search_mru_undef = _.isUndefined(self.options.search_mru),
+                    search_mru = self.is_option_set(self.view.ir_options['web_m2x_options.search_mru']);
+
+                if(can_search_mru || (search_mru_undef && search_mru)){
+                    self.update_mru_list();
+                }
+            }
         }
     });
 
