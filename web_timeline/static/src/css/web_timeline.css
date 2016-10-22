@@ -30,7 +30,17 @@
 } */
 
 .vis.timeline .item.range .content {
+      display:block;
+      overflow: hidden;
+}
+.vis.timeline .item.range:hover .content {
+      display:inline-block;
+      float: left;
+      clear: both;
+      max-width: none;
+      background-color:rgba(255, 255, 255, 0.8);
       overflow: visible;
+      z-index:100;
 }
 
 .oe_chatter_toggle {
