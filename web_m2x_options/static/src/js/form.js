@@ -100,8 +100,19 @@ openerp.web_m2x_options = function (instance) {
 
             var create_rights;
             if (!(self.options && (self.options.no_create || self.options.no_create_edit))) {
-                create_rights = new instance.web.Model(this.field.relation).call(
-                    "check_access_rights", ["create", false]);
+                // check quick create options
+                var target_model = this.field.relation
+                create_rights = new instance.web.Model('ir.model').
+                    query(['disable_quick_create']).
+                    filter([['model', '=', target_model]]).
+                    first().
+                    then(function(result){
+                        if(result.disable_quick_create)
+                            return $.when(false);
+                        else
+                            return new instance.web.Model(target_model).call(
+                                "check_access_rights", ["create", false]);
+                    });
             }
 
             $.when(search_result, create_rights).then(function (data, can_create) {
@@ -155,9 +166,12 @@ openerp.web_m2x_options = function (instance) {
                     values.push({
                         label: _t("Search More..."),
                         action: function () {
+                            // limit = 80 for improving performance, similar
+                            // to Odoo implementation here:
+                            // https://github.com/odoo/odoo/commit/8c3cdce539d87775b59b3f2d5ceb433f995821bf
                             dataset.name_search(
                                 search_val, self.build_domain(),
-                                'ilike', false).done(function (data) {
+                                'ilike', 80).done(function (data) {
                                     self._search_create_popup("search", data);
                                 });
                         },
@@ -170,15 +184,19 @@ openerp.web_m2x_options = function (instance) {
                 var raw_result = _(data.result).map(function (x) {
                     return x[1];
                 });
-                var no_quick_create = (
-                    self.options && (self.options.no_create ||
-                                     self.options.no_quick_create)
-                )
-                var m2x_create_undef = _.isUndefined(self.view.ir_options['web_m2x_options.create'])
-                var m2x_create = self.view.ir_options['web_m2x_options.create'] == "True"
+                var can_quick_create = _.isUndefined(self.view.ir_options['web_m2x_options.create']) ||
+                                       (self.view.ir_options['web_m2x_options.create'].toLowerCase() == "true");
+                if (self.options) {
+                   if (typeof self.options.create === 'boolean') {
+                     // field value is stronger than global settings
+                     can_quick_create = self.options.create;
+                   } else if (self.options.no_create || self.options.no_quick_create) {
+                     // undocumented features, try to keep compatibility
+                     can_quick_create = false;
+                   }
+                }
 
-                if (!no_quick_create && ((m2x_create_undef && can_create) ||
-                                         m2x_create)) {
+                if (can_create && can_quick_create) {
 
                     if (search_val.length > 0 &&
                         !_.include(raw_result, search_val)) {
@@ -196,15 +214,19 @@ openerp.web_m2x_options = function (instance) {
                 }
 
                 // create...
-                var no_create_edit = (
-                    self.options && (self.options.no_create ||
-                                     self.options.no_create_edit)
-                )
-                var m2x_create_edit_undef = _.isUndefined(self.view.ir_options['web_m2x_options.create_edit'])
-                var m2x_create_edit = self.view.ir_options['web_m2x_options.create_edit'] == "True"
+                var can_create_edit = _.isUndefined(self.view.ir_options['web_m2x_options.create_edit']) ||
+                                       ( self.view.ir_options['web_m2x_options.create_edit'].toLowerCase() == "true");
+                if (self.options) {
+                   if (typeof self.options.create_edit === 'boolean') {
+                     // field value is stronger than global settings
+                     can_create_edit = self.options.create_edit;
+                   } else if (self.options.no_create || self.options.no_create_edit) {
+                     // undocumented features, try to keep compatibility
+                     can_create_edit = false;
+                   }
+                }
 
-                if (!no_create_edit && ((m2x_create_edit_undef && can_create) ||
-                                        m2x_create_edit)) {
+                if (can_create && can_create_edit) {
 
                     values.push({
                         label: _t("Create and Edit..."),
@@ -301,7 +323,10 @@ openerp.web_m2x_options = function (instance) {
                     values.push({
                         label: _t("Search More..."),
                         action: function() {
-                            dataset.name_search(search_val, self.build_domain(), 'ilike', false).done(function(data) {
+                            // limit = 80 for improving performance, similar
+                            // to Odoo implementation here:
+                            // https://github.com/odoo/odoo/commit/8c3cdce539d87775b59b3f2d5ceb433f995821bf
+                            dataset.name_search(search_val, self.build_domain(), 'ilike', 80).done(function(data) {
                                 self._search_create_popup("search", data);
                             });
                         },
@@ -309,14 +334,19 @@ openerp.web_m2x_options = function (instance) {
                     });
                 }
                 // quick create
-                var no_quick_create = (
-                    self.options && (self.options.no_create ||
-                                     self.options.no_quick_create)
-                )
-                var m2x_create_undef = _.isUndefined(self.view.ir_options['web_m2x_options.create'])
-                var m2x_create = self.view.ir_options['web_m2x_options.create'] == "True"
+                var can_quick_create = _.isUndefined(self.view.ir_options['web_m2x_options.create']) ||
+                                       (self.view.ir_options['web_m2x_options.create'].toLowerCase() == "true");
+                if (self.options) {
+                   if (typeof self.options.create === 'boolean') {
+                     // field value is stronger than global settings
+                     can_quick_create = self.options.create;
+                   } else if (self.options.no_create || self.options.no_quick_create) {
+                     // undocumented features, try to keep compatibility
+                     can_quick_create = false;
+                   }
+                }
 
-                if (!no_quick_create && (m2x_create_undef || m2x_create)) {
+                if (can_quick_create) {
 
                     var raw_result = _(data.result).map(function(x) {return x[1];});
                     if (search_val.length > 0 && !_.include(raw_result, search_val)) {
@@ -332,14 +362,19 @@ openerp.web_m2x_options = function (instance) {
                 }
 
                 // create...
-                var no_create_edit = (
-                    self.options && (self.options.no_create ||
-                                     self.options.no_create_edit)
-                )
-                var m2x_create_edit_undef = _.isUndefined(self.view.ir_options['web_m2x_options.create_edit'])
-                var m2x_create_edit = self.view.ir_options['web_m2x_options.create_edit'] == "True"
+                var can_create_edit = _.isUndefined(self.view.ir_options['web_m2x_options.create_edit']) ||
+                                       ( self.view.ir_options['web_m2x_options.create_edit'].toLowerCase() == "true");
+                if (self.options) {
+                   if (typeof self.options.create_edit === 'boolean') {
+                     // field value is stronger than global settings
+                     can_create_edit = self.options.create_edit;
+                   } else if (self.options.no_create || self.options.no_create_edit) {
+                     // undocumented features, try to keep compatibility
+                     can_create_edit = false;
+                   }
+                }
 
-                if (!no_create_edit && (m2x_create_edit_undef || m2x_create_edit)) {
+                if (can_create_edit) {
 
                     values.push({
                         label: _t("Create and Edit..."),
@@ -352,6 +387,30 @@ openerp.web_m2x_options = function (instance) {
 
                 return values;
             })
+        },
+
+        render_value: function()
+        {
+            var self = this;
+            return jQuery.when(this._super.apply(this, arguments))
+            .then(function()
+            {
+                if(self.options.open)
+                {
+                    self.$el.find('.oe_tag')
+                    .css('cursor', 'pointer')
+                    .click(function(e)
+                    {
+                        var id = parseInt(jQuery(this).attr('data-id'));
+                        self.do_action({
+                            type: 'ir.actions.act_window',
+                            res_model: self.field.relation,
+                            views: [[false, 'form']],
+                            res_id: id,
+                        });
+                    });
+                }
+            });
         },
     });
 };

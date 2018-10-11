@@ -8653,12 +8653,14 @@ return /******/ (function(modules) { // webpackBootstrap
    */
   exports.stack = function(items, margin, force) {
     var i, iMax;
+
     if (force) {
       // reset top position of all items
       for (i = 0, iMax = items.length; i < iMax; i++) {
         items[i].top = null;
       }
     }
+
     // calculate new, non-overlapping positions
     for (i = 0, iMax = items.length; i < iMax; i++) {
       var item = items[i];
@@ -8728,6 +8730,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @return {boolean}        true if a and b collide, else false
    */
   exports.collision = function(a, b, margin) {
+
     return ((a.data.start) < (b.data.end) &&
         (a.data.end) > b.data.start &&
         (a.top - margin.vertical + EPSILON)              < (b.top + b.height) &&
@@ -35660,4 +35663,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ }
 /******/ ])
 });
+
 ;
+
