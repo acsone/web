@@ -8730,8 +8730,9 @@ return /******/ (function(modules) { // webpackBootstrap
    * @return {boolean}        true if a and b collide, else false
    */
   exports.collision = function(a, b, margin) {
-    return ((a.left - margin.horizontal + EPSILON)       < (b.left + b.width) &&
-        (a.left + a.width + margin.horizontal - EPSILON) > b.left &&
+
+    return ((a.data.start) < (b.data.end) &&
+        (a.data.end) > b.data.start &&
         (a.top - margin.vertical + EPSILON)              < (b.top + b.height) &&
         (a.top + a.height + margin.vertical - EPSILON)   > b.top);
   };
@@ -35662,4 +35663,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ }
 /******/ ])
 });
+
 ;
+
