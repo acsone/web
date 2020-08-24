@@ -3,7 +3,7 @@
 
 {
     'name': "Use AND conditions on omnibar search",
-    'version': '12.0.1.0.0',
+    'version': '13.0.1.0.0',
     'author': 'Versada UAB, Odoo Community Association (OCA)',
     'license': 'AGPL-3',
     'category': 'web',
