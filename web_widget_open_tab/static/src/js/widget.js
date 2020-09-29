@@ -60,7 +60,7 @@ odoo.define("web_widget_open_tab.FieldOpenTab", function(require) {
             ev.preventDefault();
             ev.stopPropagation();
             var element = $(ev.currentTarget).find("a");
-            if (element != null && element[0].href != null) {
+            if (element !== null && element[0].href !== null) {
                 window.open(this._getReference());
             }
         },
