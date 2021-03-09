@@ -146,13 +146,12 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
                 if (re_action) {
                     action = re_action[1];
                 } else {
-                    console.log("compute_mru_key: can't retrieve action id");
+                    console.log("ERROR - compute_mru_key: can't retrieve action id");
                     return "";
                 }
-            } else {
-                action += "_" + this.viewType;
-                return db + "/" + model + "/" + action + "/" + this.name;
             }
+            action += "_" + this.viewType;
+            return db + "/" + model + "/" + action + "/" + this.name;
         },
 
         get_mru_ids: function() {
