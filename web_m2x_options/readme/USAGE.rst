@@ -43,6 +43,10 @@ in the field's options dict
 
   Deactivates the color picker on many2many_tags buttons to do nothing (ignored if open is set)
 
+``search_mru`` *boolean* (Default: ``False``)
+
+  Display the MRU list stored in the localstorage before the user start typing.
+
 ir.config_parameter options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -69,6 +73,10 @@ If you disable one option, you can enable it for particular field by setting "cr
 
   Whether the field should always show "Search more..." entry or not.
 
+``web_m2x_options.search_mru`` *boolean* (Default: default value is ``False``)
+
+  Display the MRU list stored in the localstorage before the user start typing.
+
 To add these parameters go to Configuration -> Technical -> Parameters -> System Parameters and add new parameters like:
 
 - web_m2x_options.create: False
@@ -76,6 +84,7 @@ To add these parameters go to Configuration -> Technical -> Parameters -> System
 - web_m2x_options.m2o_dialog: False
 - web_m2x_options.limit: 10
 - web_m2x_options.search_more: True
+- web_m2x_options.search_mru: False
 
 
 Example

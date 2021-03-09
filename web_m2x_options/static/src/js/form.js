@@ -135,6 +135,37 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
             }
         },
 
+        compute_mru_key: function() {
+            let model = this.model,
+                db = odoo.session_info.db,
+                action =
+                    !_.isUndefined(this.record.context.params) &&
+                    this.record.context.params.action;
+            if (!action) {
+                const re_action = location.href.match(/action=(\d+)&/i);
+                if (re_action) {
+                    action = re_action[1];
+                } else {
+                    console.log("ERROR - compute_mru_key: can't retrieve action id");
+                    return "";
+                }
+            }
+            action += "_" + this.viewType;
+            return db + "/" + model + "/" + action + "/" + this.name;
+        },
+
+        get_mru_ids: function() {
+            const mru_option = "web_m2x_options_mru",
+                restore_mru_ids = JSON.parse(localStorage.getItem(mru_option)),
+                key = this.compute_mru_key();
+            if (restore_mru_ids) {
+                if (!_.isUndefined(restore_mru_ids[key])) {
+                    return restore_mru_ids[key];
+                }
+            }
+            return [];
+        },
+
         _search: function(search_val) {
             var self = this;
             if (search_val === undefined) {
@@ -163,6 +194,27 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
                     domain.push(["id", "not in", blacklisted_ids]);
                 }
 
+                var can_search_mru =
+                        self.nodeOptions &&
+                        self.is_option_set(self.nodeOptions.search_mru),
+                    search_mru_undef = _.isUndefined(self.nodeOptions.search_mru),
+                    search_mru = self.is_option_set(
+                        self.ir_options["web_m2x_options.search_mru"]
+                    );
+
+                var mru_ids = [];
+                var in_search_mru = false;
+                if (
+                    search_val == "" &&
+                    (can_search_mru || (search_mru_undef && search_mru))
+                ) {
+                    mru_ids = self.get_mru_ids();
+                    if (mru_ids.length > 0) {
+                        domain.push(["id", "in", mru_ids]);
+                        in_search_mru = true;
+                    }
+                }
+
                 self._rpc({
                     model: self.field.relation,
                     method: "name_search",
@@ -177,14 +229,26 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
                     // Possible selections for the m2o
                     var values = _.map(result, x => {
                         x[1] = self._getDisplayName(x[1]);
-                        return {
+                        const val = {
                             label:
                                 _.str.escapeHTML(x[1].trim()) || data.noDisplayContent,
                             value: x[1],
                             name: x[1],
                             id: x[0],
                         };
+                        if (in_search_mru) {
+                            val.classname = "web_m2x_dropdown_option_mru";
+                        }
+                        return val;
                     });
+                    // If we are in a mru search, reorder the result list in the
+                    // same order as the one stored to keep the saved preference
+                    // order (The most recent ones first)
+                    if (in_search_mru) {
+                        values = _(values).sortBy(function(item) {
+                            return mru_ids.indexOf(item.id);
+                        });
+                    }
 
                     // Search result value colors
                     if (self.colors && self.field_color) {
@@ -235,7 +299,7 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
                             self.ir_options["web_m2x_options.search_more"]
                         );
 
-                    if (values.length > self.limit) {
+                    if (values.length > self.limit || in_search_mru) {
                         values = values.slice(0, self.limit);
                         if (can_search_more || search_more_undef || search_more) {
                             values.push({
@@ -379,11 +443,82 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
             this.orderer.add(def);
             return def;
         },
+
+        update_mru_ids: function() {
+            var mru_option = "web_m2x_options_mru";
+            var key = this.compute_mru_key();
+            const field_val = _.isUndefined(this.value.data) || this.value.data.id;
+            // Check if the localstorage has some items for the current model
+            if (localStorage.getItem(mru_option)) {
+                var restore_mru_ids = JSON.parse(localStorage.getItem(mru_option));
+                if (restore_mru_ids[key]) {
+                    var queue = restore_mru_ids[key];
+                    // If the element doesn't exist in the stack
+                    if (queue.indexOf(field_val) < 0 && field_val) {
+                        if (queue.length < 5) {
+                            // Add the new element at the beginning
+                            queue.unshift(field_val);
+                        } else {
+                            // Remove the last element
+                            queue.pop();
+                            // Add the new element at the beginning
+                            queue.unshift(field_val);
+                        }
+                        restore_mru_ids[key] = queue;
+                    } else if (queue.indexOf(field_val) >= 0 && field_val) {
+                        // If the element already exist in the stack
+                        var index = queue.indexOf(field_val);
+                        // Remove the element from the list
+                        queue.splice(index, 1);
+                        // And put it back at the beginning
+                        queue.unshift(field_val);
+                    }
+                } else if (field_val && key) {
+                    // If the element is the first one and the key is well computed
+                    restore_mru_ids[key] = [field_val];
+                }
+                localStorage.setItem(mru_option, JSON.stringify(restore_mru_ids));
+            } else if (field_val && key) {
+                // First time to create an entry in the localstorage if the key is well computed
+                const values = {};
+                values[key] = [field_val];
+                localStorage.setItem(mru_option, JSON.stringify(values));
+            }
+        },
+
+        commitChanges: function() {
+            // If the field value has changed and has favorites option
+            const has_changed =
+                !_.isUndefined(this.lastChangeEvent) &&
+                this.lastChangeEvent.name === "field_changed";
+            if (this.isDirty || has_changed) {
+                const can_search_mru =
+                        this.nodeOptions &&
+                        this.is_option_set(this.nodeOptions.search_mru),
+                    search_mru_undef = _.isUndefined(this.nodeOptions.search_mru),
+                    search_mru = this.is_option_set(
+                        this.ir_options["web_m2x_options.search_mru"]
+                    );
+
+                if (can_search_mru || (search_mru_undef && search_mru)) {
+                    this.update_mru_ids();
+                }
+            }
+        },
     });
 
     FieldMany2ManyTags.include({
         events: _.extend({}, FieldMany2ManyTags.prototype.events, {
+            "click .o_delete": function(e) {
+                this.remove_id(
+                    $(e.target)
+                        .parent()
+                        .data("id")
+                );
+            },
             "click .badge": "_onOpenBadge",
+            "mousedown .o_colorpicker span": "update_color",
+            "focusout .o_colorpicker": "close_color_picker",
         }),
 
         _onDeleteTag: function(event) {
