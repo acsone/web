@@ -136,18 +136,29 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
         },
 
         compute_mru_key: function() {
-            var self = this,
-                model = self.model,
+            let model = this.model,
                 db = odoo.session_info.db,
-                action = self.record.context.params.action + "_" + self.viewType;
-            return db + "/" + model + "/" + action + "/" + self.name;
+                action =
+                    !_.isUndefined(this.record.context.params) &&
+                    this.record.context.params.action;
+            if (!action) {
+                const re_action = location.href.match(/action=(\d+)&/i);
+                if (re_action) {
+                    action = re_action[1];
+                } else {
+                    console.log("compute_mru_key: can't retrieve action id");
+                    return "";
+                }
+            } else {
+                action += "_" + this.viewType;
+                return db + "/" + model + "/" + action + "/" + this.name;
+            }
         },
 
         get_mru_ids: function() {
-            var mru_option = "web_m2x_options_mru",
-                self = this;
-            var restore_mru_ids = JSON.parse(localStorage.getItem(mru_option)),
-                key = self.compute_mru_key();
+            const mru_option = "web_m2x_options_mru",
+                restore_mru_ids = JSON.parse(localStorage.getItem(mru_option)),
+                key = this.compute_mru_key();
             if (restore_mru_ids) {
                 if (!_.isUndefined(restore_mru_ids[key])) {
                     return restore_mru_ids[key];
@@ -435,10 +446,9 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
         },
 
         update_mru_ids: function() {
-            var self = this,
-                mru_option = "web_m2x_options_mru";
-            var key = self.compute_mru_key();
-            const field_val = _.isUndefined(self.value.data) || self.value.data.id;
+            var mru_option = "web_m2x_options_mru";
+            var key = this.compute_mru_key();
+            const field_val = _.isUndefined(this.value.data) || this.value.data.id;
             // Check if the localstorage has some items for the current model
             if (localStorage.getItem(mru_option)) {
                 var restore_mru_ids = JSON.parse(localStorage.getItem(mru_option));
@@ -464,13 +474,13 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
                         // And put it back at the beginning
                         queue.unshift(field_val);
                     }
-                } else if (field_val) {
-                    // If the element is the first one
+                } else if (field_val && key) {
+                    // If the element is the first one and the key is well computed
                     restore_mru_ids[key] = [field_val];
                 }
                 localStorage.setItem(mru_option, JSON.stringify(restore_mru_ids));
-            } else if (field_val) {
-                // First time to create an entry in the localstorage
+            } else if (field_val && key) {
+                // First time to create an entry in the localstorage if the key is well computed
                 const values = {};
                 values[key] = [field_val];
                 localStorage.setItem(mru_option, JSON.stringify(values));
@@ -478,22 +488,21 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
         },
 
         commitChanges: function() {
-            var self = this;
             // If the field value has changed and has favorites option
             const has_changed =
-                !_.isUndefined(self.lastChangeEvent) &&
-                self.lastChangeEvent.name === "field_changed";
-            if (self.isDirty || has_changed) {
-                var can_search_mru =
-                        self.nodeOptions &&
-                        self.is_option_set(self.nodeOptions.search_mru),
-                    search_mru_undef = _.isUndefined(self.nodeOptions.search_mru),
-                    search_mru = self.is_option_set(
-                        self.ir_options["web_m2x_options.search_mru"]
+                !_.isUndefined(this.lastChangeEvent) &&
+                this.lastChangeEvent.name === "field_changed";
+            if (this.isDirty || has_changed) {
+                const can_search_mru =
+                        this.nodeOptions &&
+                        this.is_option_set(this.nodeOptions.search_mru),
+                    search_mru_undef = _.isUndefined(this.nodeOptions.search_mru),
+                    search_mru = this.is_option_set(
+                        this.ir_options["web_m2x_options.search_mru"]
                     );
 
                 if (can_search_mru || (search_mru_undef && search_mru)) {
-                    self.update_mru_ids();
+                    this.update_mru_ids();
                 }
             }
         },
