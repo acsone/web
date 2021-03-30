@@ -9,4 +9,11 @@
             </attribute>
         </t>
     </t>
+    <t t-extend="FieldMany2ManyTag">
+        <t t-jquery="span.badge" t-operation="attributes">
+            <attribute name="t-add-data-id">
+                el[0]
+            </attribute>
+        </t>
+    </t>
 </templates>
