@@ -494,16 +494,7 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
 
     FieldMany2ManyTags.include({
         events: _.extend({}, FieldMany2ManyTags.prototype.events, {
-            "click .o_delete": function(e) {
-                this.remove_id(
-                    $(e.target)
-                        .parent()
-                        .data("id")
-                );
-            },
             "click .badge": "_onOpenBadge",
-            "mousedown .o_colorpicker span": "update_color",
-            "focusout .o_colorpicker": "close_color_picker",
         }),
 
         _onDeleteTag: function(event) {
