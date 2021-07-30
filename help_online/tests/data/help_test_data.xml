@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
   <data>
     <record id="test_img_1" model="ir.attachment">
-      <field name="datas">iVBORw0KGgoAAAANSUhEUgAAANwAAAAzCAIAAABzKvGBAAAOOUlEQVR42u1beVRU5xWfYcZh3wao
+      <field
+                name="datas"
+            >iVBORw0KGgoAAAANSUhEUgAAANwAAAAzCAIAAABzKvGBAAAOOUlEQVR42u1beVRU5xWfYcZh3wao
 cSnLAIMRIw1WZVdTPTGLadIsoqBCwiJatFUjmyZVqgxL03NsFgLYuCH2tCc9bZo0icbIqqKpwRiO
 wDC4gMgyI1sEBhh633zymOW9N9tzZkze/eOeYb737r3f/X7f797vzYMtlUrZbPbk5CSjGW0lmi2T
 yawhDkYzeloDU7IYYcSaBAOl5XcGoxmtqnt7ey29MRhhRE0YUDJidcLu6emxCsZmNKOnNMaU1hAH

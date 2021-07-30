@@ -1,10 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <templates>
     <t t-name='HelpOnline.Button'>
         <t t-if='url_info'>
-            <a t-att-class="'fa fa-question-circle btn btn-icon o_help_online_button ' + (url_info.exists? '': 'o_help_online_not_found')"
-               t-att-title='url_info.title' t-att-href='url_info.url'
-               target='_blank'></a>
+            <a
+                t-att-class="'fa fa-question-circle btn btn-icon o_help_online_button ' + (url_info.exists? '': 'o_help_online_not_found')"
+                t-att-title='url_info.title'
+                t-att-href='url_info.url'
+                target='_blank'
+            />
         </t>
     </t>
 
