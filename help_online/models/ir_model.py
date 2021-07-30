@@ -59,6 +59,6 @@ class IrModelData(models.Model):
                     img_id = self.get_object_reference(module, xml_id)
 
                     img_elem.attrib["src"] = img_src.replace(xml_id, str(img_id[1]))
-                except:
+                except Exception:
                     continue
         return ET.tostring(root, encoding="utf-8", xml_declaration=False)

@@ -339,7 +339,7 @@ class ExportHelpWizard(models.TransientModel):
                 backup_file = open(filename, "w")
                 backup_file.write(xml_data)
                 backup_file.close()
-            except:
+            except Exception:
                 _logger.warning(
                     _(
                         "Unable to write autobackup file "
