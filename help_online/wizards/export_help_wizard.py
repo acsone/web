@@ -6,7 +6,7 @@ import copy
 import logging
 import time
 
-import urlparse
+from urllib.parse import urlparse
 from lxml import etree as ET
 from werkzeug.routing import Map, Rule
 
@@ -299,7 +299,6 @@ class ExportHelpWizard(models.TransientModel):
             )
             return module + "." + name
 
-    @api.multi
     def export_help(self):
         """
         Export all Qweb views related to help online in a Odoo

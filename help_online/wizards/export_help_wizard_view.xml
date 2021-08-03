@@ -48,9 +48,7 @@
         <field name="name">Export Help</field>
         <field name="res_model">export.help.wizard</field>
         <field name="view_id" ref="export_help_wizard_view" />
-        <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-        <field name="type">ir.actions.act_window</field>
     </record>
 </odoo>

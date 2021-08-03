@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_help_online,access_help_online,model_help_online,help_online.help_online_group_writer,1,1,1,1
+access_export_help_wizard,access_export_help_wizard,model_export_help_wizard,help_online.help_online_group_writer,1,1,1,1
+access_import_help_wizard,access_import_help_wizard,model_import_help_wizard,help_online.help_online_group_writer,1,1,1,1

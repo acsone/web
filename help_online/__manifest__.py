@@ -15,9 +15,9 @@
     "data": [
         "security/help_online_groups.xml",
         "security/help_online_rules.xml",
+        "security/ir.model.access.csv",
         "wizards/export_help_wizard_view.xml",
         "wizards/import_help_wizard_view.xml",
-        "views/ir_ui_view_view.xml",
         "views/help_online_view.xml",
         "data/ir_config_parameter_data.xml",
     ],

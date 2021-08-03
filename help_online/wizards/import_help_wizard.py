@@ -5,7 +5,7 @@ import base64
 import logging
 import os
 
-from cStringIO import StringIO
+from io import StringIO
 from lxml import etree
 
 from odoo import api, fields, models
@@ -33,7 +33,6 @@ class ImportHelpWizard(models.TransientModel):
 
     source_file = fields.Binary("Source File")
 
-    @api.multi
     def import_help(self):
         for this in self:
             xmlfile = StringIO(base64.decodestring(this.source_file))
