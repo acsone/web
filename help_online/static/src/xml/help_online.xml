@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <templates>
-    <t t-name='HelpOnline.Button'>
+    <t t-name='help_online.Button' owl="1">
         <t t-if='url_info'>
             <a
                 t-att-class="'fa fa-question-circle btn btn-icon o_help_online_button ' + (url_info.exists? '': 'o_help_online_not_found')"
@@ -11,29 +11,12 @@
         </t>
     </t>
 
-    <t t-name='HelpOnline.ButtonsContainer'>
-        <div class='hidden-xs btn-group btn-group-sm o_help_online_buttons'>
-        </div>
-    </t>
-
-    <t t-extend="ControlPanel">
-        <t t-jquery="div.o_cp_switch_buttons" t-operation="after">
-            <t t-call='HelpOnline.ButtonsContainer' />
-        </t>
-        <t t-jquery="div.oe-cp-switch-buttons" t-operation="after">
-            <t t-call='HelpOnline.ButtonsContainer' />
-        </t>
-    </t>
-
-    <t t-extend="X2ManyControlPanel">
-        <t t-jquery="div.o_cp_pager" t-operation="after">
-            <t t-call='HelpOnline.ButtonsContainer' />
-        </t>
-        <t t-jquery="div.oe-cp-pager" t-operation="after">
-            <div class="pull-right">
-                <t t-call='HelpOnline.ButtonsContainer' />
+    <t t-inherit="web.ControlPanel" t-inherit-mode="extension" owl="1">
+        <xpath expr="//nav[hasclass('o_cp_switch_buttons')]" position="after">
+            <div class='hidden-xs btn-group btn-group-sm o_help_online_buttons' t-name="HelpOnline">
+                <HelpOnline/>
             </div>
-        </t>
+        </xpath>
     </t>
 
 </templates>

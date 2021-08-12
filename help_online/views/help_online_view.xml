@@ -5,12 +5,14 @@
         name="help.online.assets"
         inherit_id="web.assets_backend"
     >
-        <xpath expr="." position="inside">
+        <xpath expr="//link[last()]" position="after">
             <link
                 rel="stylesheet"
                 href="/help_online/static/src/css/help_online.css"
                 type="text/css"
             />
+        </xpath>
+        <xpath expr="//script[last()]" position="after">
             <script
                 type="text/javascript"
                 src="/help_online/static/src/js/help_online.js"
