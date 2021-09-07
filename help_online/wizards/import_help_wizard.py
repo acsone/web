@@ -30,6 +30,7 @@ class XmlImport(convert.xml_import):
 
 class ImportHelpWizard(models.TransientModel):
     _name = "import.help.wizard"
+    _description = "Wizard to import Help pages"
 
     source_file = fields.Binary("Source File")
 

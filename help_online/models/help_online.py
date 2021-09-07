@@ -7,6 +7,7 @@ from odoo.tools.translate import _
 
 class HelpOnline(models.TransientModel):
     _name = "help.online"
+    _description = "Help online model"
 
     def _get_view_name(self, model, view_type, domain=None, context=None):
         parameter_model = self.env["ir.config_parameter"]
