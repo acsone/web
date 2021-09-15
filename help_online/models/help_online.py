@@ -10,7 +10,7 @@ class HelpOnline(models.TransientModel):
     _description = "Help online model"
 
     def _get_view_name(self, model, view_type, domain=None, context=None):
-        parameter_model = self.env["ir.config_parameter"]
+        parameter_model = self.env["ir.config_parameter"].sudo()
         page_prefix = parameter_model.get_param("help_online_page_prefix", False)
         if not page_prefix:
             raise exceptions.Warning(_("No page prefix parameter specified !"))
