@@ -15,9 +15,17 @@ odoo.define("oca.HelpOnline", function (require) {
 
         async willStart() {
             var self = this;
+            var model = false;
+            var view_type = 'form'
+            if(self.env.view === undefined){
+                model = self.env.action.res_model;
+            } else {
+                model = self.env.view.model;
+                view_type = self.env.view.type;
+            }
             return ajax.jsonRpc("/help_online/build_url", 'call', {
-                model: this.env.view.model,
-                view_type: this.env.view.type,
+                model: model,
+                view_type: view_type,
             }).then(function(result) {
                 self.url_info = result;
             });
