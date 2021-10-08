@@ -22,6 +22,8 @@ class HelpOnline(models.TransientModel):
         return website.search_pages(needle=name, limit=limit)
 
     def get_page_url(self, model, view_type, domain=None, context=None):
+        if not model:
+            return {}
         user_model = self.env["res.users"]
         if not user_model.has_group("help_online.help_online_group_reader"):
             return {}
