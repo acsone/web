@@ -9,6 +9,9 @@
                 target='_blank'
             />
         </t>
+        <t t-if='!url_info'>
+            <span></span>
+        </t>
     </t>
 
     <t t-inherit="web.ControlPanel" t-inherit-mode="extension" owl="1">
