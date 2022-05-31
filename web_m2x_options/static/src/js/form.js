@@ -265,6 +265,14 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
             this.events["click .badge"] = "open_badge";
             return this._super.apply(this, arguments);
         },
+        events: {
+            'click .o_delete': function(e) {
+                this.remove_id($(e.target).parent().data('id'));
+            },
+            'click .o_badge_text': 'open_badge',
+            'mousedown .o_colorpicker span': 'update_color',
+            'focusout .o_colorpicker': 'close_color_picker',
+        },
         show_error_displayer: function () {
             if ((typeof this.options.m2o_dialog === 'undefined' && this.can_create) ||
                 this.options.m2o_dialog) {
@@ -408,15 +416,17 @@ odoo.define('web_m2x_options.web_m2x_options', function (require) {
             var self = this;
             var open = (self.options && self.is_option_set(self.options.open));
             if(open){
-                self.mutex.exec(function(){
-                    var id = parseInt($(ev.currentTarget).data('id'), 10);
-                    self.do_action({
-                        type: 'ir.actions.act_window',
-                        res_model: self.field.relation,
-                        views: [[false, 'form']],
-                        res_id: id,
-                        target: "new"
-                    });
+                this.mutex.exec(function(){
+                    var id = parseInt($(ev.target).parent().data('id'), 10);
+                    if(id){
+                        self.do_action({
+                            type: 'ir.actions.act_window',
+                            res_model: self.field.relation,
+                            views: [[false, 'form']],
+                            res_id: id,
+                            target: "new"
+                        });
+                    }
                 }.bind(this));
             }else{
                 self.open_color_picker(ev);
