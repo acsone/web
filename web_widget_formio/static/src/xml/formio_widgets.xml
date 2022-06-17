@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<templates id="template" xml:space="preserve">
+    <t t-name="FieldFormIO">
+        <div
+            t-att-class="'oe_form_field container-fluid '+widget.widget_class ">
+            <div class="row">
+                <div class="col-sm-8">
+                    <div t-att-name="widget.name"
+                         t-att-id="widget.id_for_label"></div>
+                </div>
+                <div class="cool-sm-4">
+                    <h3 class="text-center text-muted">as JSON Schema</h3>
+                    <div class="card card-body bg-light jsonviewer">
+                        <pre t-att-id="'json-'+widget.id_for_label">{}</pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

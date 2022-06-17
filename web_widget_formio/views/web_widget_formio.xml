@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template id="assets_backend" name="web_widget_formio assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/web_widget_formio/static/lib/formio-4.14.8/formio.full.css"/>
+            <link rel="stylesheet" href="/web_widget_formio/static/src/less/formio_widgets.less"/>
+
+            <script type="text/javascript" src="/web_widget_formio/static/lib/formio-4.14.8/formio.full.js"/>
+            <script type="text/javascript" src="/web_widget_formio/static/src/js/formio_widgets.js"/>
+
+        </xpath>
+    </template>
+
+</odoo>
