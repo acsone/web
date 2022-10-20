@@ -432,7 +432,7 @@ odoo.define("web_m2x_options.web_m2x_options", function(require) {
         update_mru_ids: function() {
             var mru_option = "web_m2x_options_mru";
             var key = this.compute_mru_key();
-            const field_val = _.isUndefined(this.value.data) || this.value.data.id;
+            const field_val = _.isUndefined(this.value.data) ? false : this.value.data.id;
             // Check if the localstorage has some items for the current model
             if (localStorage.getItem(mru_option)) {
                 var restore_mru_ids = JSON.parse(localStorage.getItem(mru_option));
