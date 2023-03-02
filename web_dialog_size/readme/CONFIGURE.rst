@@ -1,4 +1,5 @@
-If you want to set dialog boxes maximized by default, you need to:
+By default, the module respects the caller's ``dialog_size`` option.
+If you want to set d  ialog boxes maximized by default, you need to:
 
 #. Go to *Settings -> Technical -> Parameters -> System Parameters*
 #. Add a new record with the text *web_dialog_size.default_maximize* in
