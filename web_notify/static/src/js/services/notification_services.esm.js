@@ -1,6 +1,7 @@
 /** @odoo-module **/
 import {browser} from "@web/core/browser/browser";
 import {registry} from "@web/core/registry";
+const {Markup} = require('web.utils');
 
 export const webNotificationService = {
     dependencies: ["bus_service", "notification"],
@@ -19,7 +20,7 @@ export const webNotificationService = {
 
             notifications.forEach(function (notif) {
                 browser.setTimeout(function () {
-                    notification.add(notif.message, {
+                    notification.add(Markup(notif.message), {
                         title: notif.title,
                         type: notif.type,
                         sticky: notif.sticky,
