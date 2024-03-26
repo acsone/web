@@ -34,7 +34,7 @@ class TestWebFieldTooltip(SavepointCase):
                     "tooltip_text": "this explains a lot",
                 }
             )
-        self.assertIn(e.exception.name, "A tooltip already exists for this field")
+        self.assertIn(e.exception.args[0], "A tooltip already exists for this field")
 
     def test_tooltip_name(self):
         self.assertEqual(
