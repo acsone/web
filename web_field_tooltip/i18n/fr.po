@@ -105,7 +105,7 @@ msgstr "Dernière mise à jour le"
 #: code:addons/web_field_tooltip/static/src/views/form/form_controller.esm.js:0
 #, python-format
 msgid "Manage tooltips"
-msgstr ""
+msgstr "Gestion des infobulles"
 
 #. module: web_field_tooltip
 #: model:ir.model.fields,field_description:web_field_tooltip.field_ir_model_fields_tooltip__model_id

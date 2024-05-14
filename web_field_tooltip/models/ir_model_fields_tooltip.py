@@ -13,17 +13,25 @@ class IrModelFieldsTooltip(models.Model):
     model_id = fields.Many2one(
         string="Model",
         comodel_name="ir.model",
-        ondelete="cascade",
+        compute="_compute_model_id",
+        store=True,
+    )
+    proxy_model_id = fields.Many2one(
+        comodel_name="ir.model.proxy",
         required=True,
         help="Model for the Field Tooltip.",
-        default=lambda self: self._get_default_model_id(),
+        default=lambda self: self._get_default_proxy_model_id(),
     )
     model = fields.Char(related="model_id.model", string="Model Name", store=True)
     field_id = fields.Many2one(
         string="Field",
-        required=True,
         comodel_name="ir.model.fields",
-        ondelete="cascade",
+        compute="_compute_field_id",
+        store=True,
+    )
+    proxy_field_id = fields.Many2one(
+        comodel_name="ir.model.fields.proxy",
+        required=True,
     )
     field_name = fields.Char(related="field_id.name", store=True)
     name = fields.Char(
@@ -34,7 +42,6 @@ class IrModelFieldsTooltip(models.Model):
         default=True,
         help="Set active to false to hide the Tooltip without removing it.",
     )
-    field_name = fields.Char(related="field_id.name")
     tooltip_text = fields.Html(required=True)
 
     @api.model
@@ -44,9 +51,16 @@ class IrModelFieldsTooltip(models.Model):
         default_model = context.get("default_model")
         default_field = context.get("default_field_name")
         if default_model and default_field:
-            field = self.env["ir.model.fields"].search(
-                [("model_id.model", "=", default_model), ("name", "=", default_field)],
-                limit=1,
+            field = (
+                self.env["ir.model.fields"]
+                .sudo()
+                .search(
+                    [
+                        ("model_id.model", "=", default_model),
+                        ("name", "=", default_field),
+                    ],
+                    limit=1,
+                )
             )
             res.update({"model_id": field.model_id.id, "field_id": field.id})
         return res
@@ -64,9 +78,11 @@ class IrModelFieldsTooltip(models.Model):
             ):
                 raise UserError(_("A tooltip already exists for this field"))
 
-    def _get_default_model_id(self):
+    def _get_default_proxy_model_id(self):
         tooltip_model = self.env.context.get("default_model")
-        model = self.env["ir.model"].search([("model", "=", tooltip_model)], limit=1)
+        model = (
+            self.env["ir.model"].sudo().search([("model", "=", tooltip_model)], limit=1)
+        )
         return model.id or False
 
     @api.depends("model_id", "field_id")
@@ -74,4 +90,22 @@ class IrModelFieldsTooltip(models.Model):
         for tooltip in self:
             tooltip.name = "Tooltip for {} on {}".format(
                 tooltip.field_id.name, tooltip.model_id.name
+            )
+
+    @api.depends("proxy_model_id")
+    def _compute_model_id(self):
+        for rec in self:
+            rec.model_id = (
+                rec.env["ir.model"].sudo().browse(rec.proxy_model_id.id)
+                if rec.proxy_model_id
+                else False
+            )
+
+    @api.depends("proxy_field_id")
+    def _compute_field_id(self):
+        for rec in self:
+            rec.field_id = (
+                rec.env["ir.model.fields"].sudo().browse(rec.proxy_field_id.id)
+                if rec.proxy_field_id
+                else False
             )

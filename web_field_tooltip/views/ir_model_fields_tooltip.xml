@@ -17,11 +17,11 @@
                     />
                     <group name="first">
                         <group name="left">
-                            <field name="active" invisible="1" />
-                            <field name="model_id" />
+                            <field name="proxy_model_id" string="Model" />
                             <field
-                                name="field_id"
-                                domain="[('model_id', '=', model_id)]"
+                                name="proxy_field_id"
+                                string="Field"
+                                domain="[('model_id', '=', proxy_model_id)]"
                             />
                         </group>
                         <group name="right">
@@ -31,6 +31,11 @@
                     </group>
                     <group name="second">
                         <field name="tooltip_text" />
+                    </group>
+                    <group name="group_invisible" invisible="1">
+                        <field name="active" />
+                        <field name="model_id" />
+                        <field name="field_id" />
                     </group>
                 </sheet>
             </form>

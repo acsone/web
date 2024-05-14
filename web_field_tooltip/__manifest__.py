@@ -6,7 +6,7 @@
     "name": "Web Field Tooltip",
     "summary": """
         Displays customizable tooltips for fields""",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.1",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/web",
@@ -15,6 +15,8 @@
         "security/res_groups.xml",
         "security/ir_model_access.xml",
         "views/ir_model_fields_tooltip.xml",
+        "views/ir_model_proxy_views.xml",
+        "views/ir_model_fields_proxy_views.xml",
         "views/res_users.xml",
     ],
     "assets": {

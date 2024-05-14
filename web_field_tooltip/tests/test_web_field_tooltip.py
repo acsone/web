@@ -19,8 +19,8 @@ class TestWebFieldTooltip(TransactionCase):
         )
         cls.email_tooltip = cls.Tooltip.create(
             {
-                "model_id": cls.partner_model.id,
-                "field_id": cls.email_partner_field.id,
+                "proxy_model_id": cls.partner_model.id,
+                "proxy_field_id": cls.email_partner_field.id,
                 "tooltip_text": "this explains a lot",
             }
         )
@@ -29,8 +29,8 @@ class TestWebFieldTooltip(TransactionCase):
         with self.assertRaises(UserError) as e:
             self.email_tooltip = self.Tooltip.create(
                 {
-                    "model_id": self.partner_model.id,
-                    "field_id": self.email_partner_field.id,
+                    "proxy_model_id": self.partner_model.id,
+                    "proxy_field_id": self.email_partner_field.id,
                     "tooltip_text": "this explains a lot",
                 }
             )
