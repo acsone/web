@@ -2,14 +2,14 @@
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
 
 .o_favorites_menu {
-    .o-edit-user-filter {
+    .o_edit_user_filter {
         @include o-position-absolute(50%, 30px);
         margin-top: -6px;
         cursor: pointer;
     }
 }
 
-.o-edit-user-filter-popover {
+.o_edit_user_filter_popover {
     a {
         cursor: pointer;
         padding: 0.3rem 0.75rem;
@@ -22,6 +22,6 @@
     }
 }
 
-.o-edit-user-filter-editable {
+.o_edit_user_filter_editable {
     cursor: pointer;
 }
