@@ -15,7 +15,9 @@ class IrFilters(models.Model):
         ids = map(lambda f: f["id"], res)
         # Browse filters that are in res
         filters = self.browse(ids)
-        for i, res_filter in enumerate(res):
+        for res_filter in res:
             # Add the field 'facet' to the result
-            res[i]["facet"] = filters.filtered(lambda f: f.id == res_filter["id"]).facet
+            res_filter["facet"] = filters.filtered(
+                lambda f: f.id == res_filter["id"]
+            ).facet
         return res
