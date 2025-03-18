@@ -1,7 +1,7 @@
 // Unset flex property otherwise, when clicking on handler,
 // the div tries to grow before actually dragging the div
 .remove_flex {
-    flex: unset !important;
+    flex-grow: unset !important;
 }
 
 // Unset pointer-event while dragging otherwise,
