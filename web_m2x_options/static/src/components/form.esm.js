@@ -1,71 +1,23 @@
-/** @odoo-module **/
 import {
-    Many2ManyTagsField,
-    Many2ManyTagsFieldColorEditable,
-    many2ManyTagsField,
-} from "@web/views/fields/many2many_tags/many2many_tags_field";
+    AvatarMany2XAutocomplete,
+    Many2XAutocomplete,
+} from "@web/views/fields/relational_utils";
 import {Many2OneField, many2OneField} from "@web/views/fields/many2one/many2one_field";
 import {FormController} from "@web/views/form/form_controller";
-import {
-    KanbanMany2OneAvatarField,
-    Many2OneAvatarField,
-} from "@web/views/fields/many2one_avatar/many2one_avatar_field";
-import {
-    KanbanMany2ManyTagsAvatarField,
-    Many2ManyTagsAvatarField,
-} from "@web/views/fields/many2many_tags_avatar/many2many_tags_avatar_field";
-
-import {Many2XAutocomplete} from "@web/views/fields/relational_utils";
 import {evaluateBooleanExpr} from "@web/core/py_js/py";
+import {fieldColorProps} from "../views/fields/standard_field_props.esm";
 import {isX2Many} from "@web/views/utils";
+import {many2ManyTagsField} from "@web/views/fields/many2many_tags/many2many_tags_field";
 import {patch} from "@web/core/utils/patch";
+import {registry} from "@web/core/registry";
 import {session} from "@web/session";
 
-const fieldColorProps = {
-    fieldColor: {type: String, optional: true},
-    fieldColorOptions: {type: Object, optional: true},
-};
-
-Many2OneField.props = {
-    ...Many2OneField.props,
-    noSearchMore: {type: Boolean, optional: true},
+AvatarMany2XAutocomplete.props = {
+    ...AvatarMany2XAutocomplete.props,
     ...fieldColorProps,
 };
 Many2XAutocomplete.props = {
     ...Many2XAutocomplete.props,
-    ...fieldColorProps,
-};
-
-KanbanMany2OneAvatarField.props = {
-    ...KanbanMany2OneAvatarField.props,
-    ...fieldColorProps,
-};
-
-Many2OneAvatarField.props = {
-    ...Many2OneAvatarField.props,
-    noSearchMore: {type: Boolean, optional: true},
-    ...fieldColorProps,
-};
-
-Many2ManyTagsField.props = {
-    ...Many2ManyTagsField.props,
-    searchLimit: {type: Number, optional: true},
-    ...fieldColorProps,
-};
-
-Many2ManyTagsFieldColorEditable.props = {
-    ...Many2ManyTagsFieldColorEditable.props,
-    searchLimit: {type: Number, optional: true},
-    ...fieldColorProps,
-};
-
-Many2ManyTagsAvatarField.props = {
-    ...Many2ManyTagsAvatarField.props,
-    ...fieldColorProps,
-};
-
-KanbanMany2ManyTagsAvatarField.props = {
-    ...KanbanMany2ManyTagsAvatarField.props,
     ...fieldColorProps,
 };
 
@@ -152,14 +104,15 @@ patch(many2OneField, {
     },
 
     m2o_options_props(props, attrs, options) {
-        props = this.m2o_options_props_create(props, attrs, options);
-        props = this.m2o_options_props_create_edit(props, attrs, options);
-        props = this.m2o_options_props_limit(props, attrs, options);
-        props = this.m2o_options_props_search_more(props, attrs, options);
-        props = this.m2o_options_props_open(props, attrs, options);
-        props.fieldColor = options.field_color;
-        props.fieldColorOptions = options.colors;
-        return props;
+        let newProps = props;
+        newProps = this.m2o_options_props_create(newProps, attrs, options);
+        newProps = this.m2o_options_props_create_edit(newProps, attrs, options);
+        newProps = this.m2o_options_props_limit(newProps, attrs, options);
+        newProps = this.m2o_options_props_search_more(newProps, attrs, options);
+        newProps = this.m2o_options_props_open(newProps, attrs, options);
+        newProps.fieldColor = options.field_color;
+        newProps.fieldColorOptions = options.colors;
+        return newProps;
     },
     extractProps({attrs, context, decorations, options, string}, dynamicInfo) {
         const props = super.extractProps(
@@ -257,13 +210,14 @@ patch(many2ManyTagsField, {
     },
 
     m2m_options_props(props, attrs, options) {
-        props = this.m2m_options_props_create(props, attrs, options);
-        props = this.m2m_options_props_create_edit(props, attrs, options);
-        props = this.m2m_options_props_limit(props, attrs, options);
-        props = this.m2m_options_props_search_more(props, attrs, options);
-        props.fieldColor = options.field_color;
-        props.fieldColorOptions = options.colors;
-        return props;
+        let newProps = props;
+        newProps = this.m2m_options_props_create(newProps, attrs, options);
+        newProps = this.m2m_options_props_create_edit(newProps, attrs, options);
+        newProps = this.m2m_options_props_limit(newProps, attrs, options);
+        newProps = this.m2m_options_props_search_more(newProps, attrs, options);
+        newProps.fieldColor = options.field_color;
+        newProps.fieldColorOptions = options.colors;
+        return newProps;
     },
     extractProps({attrs, options, string}, dynamicInfo) {
         const props = super.extractProps({attrs, options, string}, dynamicInfo);
@@ -273,10 +227,6 @@ patch(many2ManyTagsField, {
 });
 
 patch(Many2XAutocomplete.prototype, {
-    setup() {
-        super.setup();
-        this.ir_options = session.web_m2x_options;
-    },
     async loadOptionsSource(request) {
         var options = await super.loadOptionsSource(request);
         this.field_color = this.props.fieldColor;
@@ -358,4 +308,19 @@ patch(FormController.prototype, {
             }
         }
     },
+});
+
+// O.W.L. v18+: schema is validated in dev mode on adding to registry
+patch(registry.category("fields").validationSchema, {
+    m2o_options_props_create: {type: Function, optional: true},
+    m2o_options_props_create_edit: {type: Function, optional: true},
+    m2o_options_props_limit: {type: Function, optional: true},
+    m2o_options_props_search_more: {type: Function, optional: true},
+    m2o_options_props_open: {type: Function, optional: true},
+    m2o_options_props: {type: Function, optional: true},
+    m2m_options_props_create: {type: Function, optional: true},
+    m2m_options_props_create_edit: {type: Function, optional: true},
+    m2m_options_props_limit: {type: Function, optional: true},
+    m2m_options_props_search_more: {type: Function, optional: true},
+    m2m_options_props: {type: Function, optional: true},
 });
