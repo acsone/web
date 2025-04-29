@@ -25,4 +25,14 @@
         </xpath>
     </t>
 
+    <t
+        t-name="web_m2x_options.Many2ManyTagsAvatarFieldPopover"
+        t-inherit="web.Many2ManyTagsAvatarField"
+        t-inherit-mode="extension"
+    >
+        <Many2XAutocomplete position="attributes">
+            <attribute name="noSearchMore">props.noSearchMore</attribute>
+        </Many2XAutocomplete>
+    </t>
+
 </templates>
