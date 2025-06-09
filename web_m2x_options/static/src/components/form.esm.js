@@ -3,6 +3,7 @@ import {
     Many2XAutocomplete,
 } from "@web/views/fields/relational_utils";
 import {Many2OneField, many2OneField} from "@web/views/fields/many2one/many2one_field";
+import {Many2OneReferenceField} from "@web/views/fields/many2one_reference/many2one_reference_field";
 import {FormController} from "@web/views/form/form_controller";
 import {evaluateBooleanExpr} from "@web/core/py_js/py";
 import {fieldColorProps} from "../views/fields/standard_field_props.esm";
@@ -113,6 +114,13 @@ patch(many2OneField, {
             dynamicInfo
         );
         return this.m2o_options_props(props, attrs, options);
+    },
+});
+
+patch(Many2OneReferenceField, {
+    // eslint-disable-next-line no-unused-vars
+    m2o_options_props(props, attrs, options) {
+        return props;
     },
 });
 
