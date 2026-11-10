@@ -101,17 +101,11 @@ patch(FormRenderer.prototype, {
             const {minWidth, maxWidth} = getBounds();
             setTargetWidth(clampWidth(nextWidth, minWidth, maxWidth));
         };
-        const onWindowResize = () => {
-            const currentWidth = targetEl.getBoundingClientRect().width;
-            const {minWidth, maxWidth} = getBounds();
-            setTargetWidth(clampWidth(currentWidth, minWidth, maxWidth));
-        };
 
         handleEl.addEventListener("pointerdown", onPointerDown);
         handleEl.addEventListener("pointermove", onPointerMove);
         handleEl.addEventListener("pointerup", stopResizing);
         handleEl.addEventListener("pointercancel", stopResizing);
-        window.addEventListener("resize", onWindowResize);
 
         this[RESIZE_STATE] = {
             targetEl,
@@ -119,7 +113,6 @@ patch(FormRenderer.prototype, {
             onPointerDown,
             onPointerMove,
             stopResizing,
-            onWindowResize,
         };
     },
 
@@ -128,14 +121,12 @@ patch(FormRenderer.prototype, {
         if (!resizeState) {
             return;
         }
-        const {handleEl, onPointerDown, onPointerMove, stopResizing, onWindowResize} =
-            resizeState;
+        const {handleEl, onPointerDown, onPointerMove, stopResizing} = resizeState;
         stopResizing();
         handleEl.removeEventListener("pointerdown", onPointerDown);
         handleEl.removeEventListener("pointermove", onPointerMove);
         handleEl.removeEventListener("pointerup", stopResizing);
         handleEl.removeEventListener("pointercancel", stopResizing);
-        window.removeEventListener("resize", onWindowResize);
         const previewEls = document.querySelectorAll(
             `${PREVIEW_SELECTOR}.${PREVIEW_RESIZING_CLASS}`
         );
